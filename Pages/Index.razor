@@ -1,0 +1,55 @@
+﻿@page "/"
+
+@using Syncfusion.Blazor.Grids
+
+<SfGrid DataSource="@Orders" TValue="Order" Height="315" Toolbar="@(new List<string>{"Add","Edit","Delete","Update","Cancel" })">
+    <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true"></GridEditSettings>
+    <GridColumns>
+        <GridColumn Field=@nameof(Order.OrderID) IsPrimaryKey="true" HeaderText="Order ID" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+        <GridForeignColumn Field=@nameof(Order.EmployeeID) TValue="EmployeeData" EditType="EditType.DefaultEdit" HeaderText="Employee Name" ForeignKeyValue="FirstName" ForeignDataSource="@Employees" Width="150">
+            <EditTemplate>
+                <SfComboBox ID="EmployeeID" @bind-Value="@((context as Order).EmployeeID)" DataSource="@Employees">
+                    <ComboBoxFieldSettings Text="FirstName" Value="EmployeeID"></ComboBoxFieldSettings>
+                </SfComboBox>
+            </EditTemplate>
+        </GridForeignColumn>
+        <GridColumn Field=@nameof(Order.OrderDate) HeaderText="Order Date" Format="d" Type="ColumnType.Date" TextAlign="TextAlign.Right" Width="130"></GridColumn>
+        <GridColumn Field=@nameof(Order.Freight) HeaderText="Freight" Format="C2" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code {
+    public List<Order> Orders { get; set; }
+    public List<EmployeeData> Employees { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Orders = Enumerable.Range(1, 25).Select(x => new Order()
+            {
+                OrderID = 1000 + x,
+                EmployeeID = x,
+                Freight = 2.1 * x,
+                OrderDate = DateTime.Now.AddDays(-x),
+            }).ToList();
+
+        Employees = Enumerable.Range(1, 25).Select(x => new EmployeeData()
+            {
+                EmployeeID = x,
+                FirstName = (new string[] { "Nancy" + x, "Andrew" + x, "Janet" + x, "Margaret" + x, "Steven" + x })[new Random().Next(5)],
+            }).ToList();
+    }
+
+    public class Order
+    {
+        public int? OrderID { get; set; }
+        public int? EmployeeID { get; set; }
+        public DateTime? OrderDate { get; set; }
+        public double? Freight { get; set; }
+    }
+
+    public class EmployeeData
+    {
+        public int? EmployeeID { get; set; }
+        public string FirstName { get; set; }
+    }
+}
